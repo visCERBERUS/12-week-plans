@@ -21,14 +21,51 @@ export const useTasksStore = defineStore('tasks', () => {
     return tasksByDate.value[key]
   }
 
-  function addTask(text) {
+  function addTask(text, options = {}) {
     const key = getTodayKey()
     if (!tasksByDate.value[key]) tasksByDate.value[key] = []
     tasksByDate.value[key].push({
       id: crypto.randomUUID(),
       text,
       done: false,
+      plannedPomodoros: options.plannedPomodoros ?? 1,
+      completedPomodoros: 0,
+      isUnplanned: options.isUnplanned ?? false,
+      pomodoroLog: [],
+      interruptionsCount: 0,
     })
+  }
+
+  function addUnplannedTask(text) {
+    addTask(text, { isUnplanned: true })
+  }
+
+  function incrementPlanned(id) {
+    const tasks = getTodayTasks()
+    const task = tasks.find(t => t.id === id)
+    if (task) task.plannedPomodoros = (task.plannedPomodoros ?? 1) + 1
+  }
+
+  function decrementPlanned(id) {
+    const tasks = getTodayTasks()
+    const task = tasks.find(t => t.id === id)
+    if (task && (task.plannedPomodoros ?? 1) > 1) task.plannedPomodoros -= 1
+  }
+
+  function recordCompletedPomodoro(id) {
+    const tasks = getTodayTasks()
+    const task = tasks.find(t => t.id === id)
+    if (task) {
+      task.completedPomodoros = (task.completedPomodoros ?? 0) + 1
+      if (!task.pomodoroLog) task.pomodoroLog = []
+      task.pomodoroLog.push({ completedAt: new Date().toISOString() })
+    }
+  }
+
+  function recordInterruption(id) {
+    const tasks = getTodayTasks()
+    const task = tasks.find(t => t.id === id)
+    if (task) task.interruptionsCount = (task.interruptionsCount || 0) + 1
   }
 
   function toggleTask(id) {
@@ -77,9 +114,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   function completeTimer() {
     if (activeTimer.value) {
-      const tasks = getTodayTasks()
-      const task = tasks.find(t => t.id === activeTimer.value.taskId)
-      if (task) task.done = true
+      recordCompletedPomodoro(activeTimer.value.taskId)
     }
     activeTimer.value = null
   }
@@ -90,6 +125,11 @@ export const useTasksStore = defineStore('tasks', () => {
     getTodayKey,
     getTodayTasks,
     addTask,
+    addUnplannedTask,
+    incrementPlanned,
+    decrementPlanned,
+    recordCompletedPomodoro,
+    recordInterruption,
     toggleTask,
     deleteTask,
     startTimer,

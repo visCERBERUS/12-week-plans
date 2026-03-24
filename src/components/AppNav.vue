@@ -23,7 +23,7 @@ const route = useRoute()
 const navItems = [
   { path: '/', icon: '🏠', label: 'Главная' },
   { path: '/tracker', icon: '📓', label: 'Трекер дня' },
-  { path: '/pomodoro', icon: '🍅', label: 'Помидор' },
+  { path: '/daily', icon: '📅', label: 'Дневные задачи' },
   { path: '/productivity', icon: '📊', label: 'Продуктивность' },
   { path: '/weekly', icon: '📆', label: 'Недельный план' },
   { path: '/monthly', icon: '🗓️', label: '4-недельный план' },

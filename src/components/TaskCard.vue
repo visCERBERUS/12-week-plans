@@ -1,12 +1,29 @@
 <template>
-  <div class="card task-card" :class="{ 'task-active-timer': isActive }">
+  <div class="card task-card" :class="{ 'task-active-timer': isActive, 'task-done': task.done }">
     <div class="task-top">
       <label class="task-check-label">
         <input type="checkbox" :checked="task.done" @change="$emit('toggle')" />
         <span :class="{ 'done-text': task.done }">{{ task.text }}</span>
       </label>
-      <button class="btn btn-ghost btn-icon" @click="$emit('delete')" title="Удалить">🗑️</button>
+      <div class="task-actions">
+        <span v-if="isCompleteByPlan" class="badge-done">✅ Выполнено по плану</span>
+        <button class="btn btn-ghost btn-icon" @click="$emit('delete')" title="Удалить">🗑️</button>
+      </div>
     </div>
+
+    <!-- Pomodoro row -->
+    <div class="pomodoro-row" v-if="!task.done">
+      <span
+        v-for="i in totalPomodoros"
+        :key="i"
+        class="pomodoro-cell"
+        :title="i <= completedPomodoros ? 'Выполнен' : 'Запланирован'"
+      >{{ i <= completedPomodoros ? '🍅' : '☐' }}</span>
+      <button class="btn btn-ghost btn-icon pomodoro-adj" aria-label="Убрать помидор" @click="$emit('decrement-planned')" title="Убрать помидор">−</button>
+      <button class="btn btn-ghost btn-icon pomodoro-adj" aria-label="Добавить помидор" @click="$emit('increment-planned')" title="Добавить помидор">+</button>
+    </div>
+
+    <!-- Timer or start button -->
     <div class="task-timer-row" v-if="!task.done">
       <template v-if="isActive">
         <span class="pomodoro-display">{{ pomodoroDisplay }}</span>
@@ -16,8 +33,12 @@
         <button class="btn btn-ghost btn-sm" @click="tasksStore.resetTimer()">⏹ Сброс</button>
       </template>
       <template v-else>
-        <button class="btn btn-ghost btn-sm" @click="startPomodoro(25 * 60 * 1000)">▶ 25 мин</button>
-        <button class="btn btn-ghost btn-sm" @click="startPomodoro(50 * 60 * 1000)">▶ 50 мин</button>
+        <button
+          class="btn btn-ghost btn-sm"
+          :disabled="!!tasksStore.activeTimer"
+          :title="tasksStore.activeTimer ? 'Другой таймер уже запущен' : 'Начать помидор 25 мин'"
+          @click="$emit('start-pomodoro')"
+        >▶ Начать помидор</button>
       </template>
     </div>
   </div>
@@ -30,7 +51,7 @@ import { useTasksStore } from '../stores/tasks.js'
 const props = defineProps({
   task: { type: Object, required: true },
 })
-const emit = defineEmits(['toggle', 'delete'])
+const emit = defineEmits(['toggle', 'delete', 'start-pomodoro', 'increment-planned', 'decrement-planned', 'record-interruption'])
 
 const tasksStore = useTasksStore()
 
@@ -38,19 +59,16 @@ const isActive = computed(() =>
   tasksStore.activeTimer?.taskId === props.task.id
 )
 
+const completedPomodoros = computed(() => props.task.completedPomodoros ?? 0)
+const totalPomodoros = computed(() => props.task.plannedPomodoros ?? 1)
+const isCompleteByPlan = computed(() => completedPomodoros.value >= totalPomodoros.value && totalPomodoros.value > 0)
+
 const now = ref(Date.now())
 let interval = null
 
 onMounted(() => {
   interval = setInterval(() => {
     now.value = Date.now()
-    if (isActive.value && tasksStore.activeTimer && !tasksStore.activeTimer.isPaused) {
-      const remaining = tasksStore.activeTimer.endTime - now.value
-      if (remaining <= 0) {
-        playBeep()
-        tasksStore.completeTimer()
-      }
-    }
   }, 500)
 })
 
@@ -73,10 +91,6 @@ const pomodoroDisplay = computed(() => {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
 })
 
-function startPomodoro(durationMs) {
-  tasksStore.startTimer(props.task.id, durationMs)
-}
-
 function togglePause() {
   if (tasksStore.activeTimer?.isPaused) {
     tasksStore.resumeTimer()
@@ -84,28 +98,18 @@ function togglePause() {
     tasksStore.pauseTimer()
   }
 }
-
-function playBeep() {
-  try {
-    const ctx = new AudioContext()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.frequency.value = 880
-    gain.gain.setValueAtTime(0.3, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 1)
-  } catch (e) {
-    console.warn('Audio not available', e)
-  }
-}
 </script>
 
 <style scoped>
 .task-card {
   transition: all 0.3s ease;
+}
+.task-active-timer {
+  border: 2px solid var(--accent);
+  background: rgba(108, 99, 255, 0.05);
+}
+.task-done {
+  opacity: 0.7;
 }
 .task-top {
   display: flex;
@@ -125,6 +129,34 @@ function playBeep() {
   height: 18px;
   accent-color: var(--accent);
   cursor: pointer;
+}
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.badge-done {
+  font-size: 0.78rem;
+  color: #22c55e;
+  white-space: nowrap;
+}
+.pomodoro-row {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+.pomodoro-cell {
+  font-size: 1rem;
+  cursor: default;
+  user-select: none;
+}
+.pomodoro-adj {
+  font-size: 0.85rem;
+  padding: 0 0.3rem;
+  line-height: 1;
+  margin-left: 0.25rem;
 }
 .task-timer-row {
   display: flex;
@@ -148,4 +180,9 @@ function playBeep() {
   padding: 0.3rem 0.65rem;
   font-size: 0.82rem;
 }
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 </style>
+
