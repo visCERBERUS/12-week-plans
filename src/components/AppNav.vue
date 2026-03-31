@@ -25,6 +25,7 @@ const navItems = [
   { path: '/tracker', icon: '📓', label: 'Трекер' },
   { path: '/daily', icon: '📅', label: 'День' },
   { path: '/productivity', icon: '📊', label: 'Стат.' },
+  { path: '/knowledge', icon: '📚', label: 'Учёба' },
   { path: '/weekly', icon: '📆', label: 'Неделя' },
   { path: '/monthly', icon: '🗓️', label: '4 нед.' },
   { path: '/yearly', icon: '🎯', label: '12 нед.' },

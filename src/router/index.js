@@ -9,6 +9,7 @@ import Settings from '../views/Settings.vue'
 import PomodoroTimer from '../views/PomodoroTimer.vue'
 import ProductivityTracker from '../views/ProductivityTracker.vue'
 import Finance from '../views/Finance.vue'
+import Knowledge from '../views/Knowledge.vue'
 
 const routes = [
   { path: '/', component: Dashboard },
@@ -21,6 +22,7 @@ const routes = [
   { path: '/pomodoro', component: PomodoroTimer },
   { path: '/productivity', component: ProductivityTracker },
   { path: '/finance', component: Finance },
+  { path: '/knowledge', component: Knowledge },
 ]
 
 export default createRouter({
