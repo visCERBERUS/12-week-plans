@@ -33,6 +33,7 @@ export const useTasksStore = defineStore('tasks', () => {
       isUnplanned: options.isUnplanned ?? false,
       pomodoroLog: [],
       interruptionsCount: 0,
+      notes: '',
     })
   }
 
@@ -72,6 +73,12 @@ export const useTasksStore = defineStore('tasks', () => {
     const tasks = getTodayTasks()
     const task = tasks.find(t => t.id === id)
     if (task) task.done = !task.done
+  }
+
+  function updateTaskNotes(id, notes) {
+    const tasks = getTodayTasks()
+    const task = tasks.find(t => t.id === id)
+    if (task) task.notes = notes
   }
 
   function deleteTask(id) {
@@ -132,6 +139,7 @@ export const useTasksStore = defineStore('tasks', () => {
     recordInterruption,
     toggleTask,
     deleteTask,
+    updateTaskNotes,
     startTimer,
     pauseTimer,
     resumeTimer,
