@@ -30,6 +30,8 @@
         :task="task"
         @toggle="weeklyStore.toggleTask(currentWeek, task.id)"
         @delete="weeklyStore.deleteTask(currentWeek, task.id)"
+        @update="text => weeklyStore.updateTask(currentWeek, task.id, text)"
+        @update-notes="notes => weeklyStore.updateTaskNotes(currentWeek, task.id, notes)"
       />
     </div>
   </div>

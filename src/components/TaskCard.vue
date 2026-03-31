@@ -41,6 +41,25 @@
         >▶ Начать помидор</button>
       </template>
     </div>
+
+    <!-- Notes section -->
+    <div class="notes-row">
+      <button
+        class="btn btn-ghost btn-sm notes-toggle-btn"
+        :class="{ 'notes-active': task.notes }"
+        @click="notesOpen = !notesOpen"
+        title="Конспект"
+      >📝 Конспект</button>
+    </div>
+    <div v-if="notesOpen" class="notes-section">
+      <textarea
+        class="input notes-textarea"
+        :value="task.notes || ''"
+        placeholder="Конспект к задаче..."
+        rows="4"
+        @input="$emit('update-notes', $event.target.value)"
+      />
+    </div>
   </div>
 </template>
 
@@ -51,9 +70,11 @@ import { useTasksStore } from '../stores/tasks.js'
 const props = defineProps({
   task: { type: Object, required: true },
 })
-const emit = defineEmits(['toggle', 'delete', 'start-pomodoro', 'increment-planned', 'decrement-planned', 'record-interruption'])
+const emit = defineEmits(['toggle', 'delete', 'start-pomodoro', 'increment-planned', 'decrement-planned', 'record-interruption', 'update-notes'])
 
 const tasksStore = useTasksStore()
+
+const notesOpen = ref(false)
 
 const isActive = computed(() =>
   tasksStore.activeTimer?.taskId === props.task.id
@@ -183,6 +204,27 @@ function togglePause() {
 button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.notes-row {
+  margin-top: 0.5rem;
+}
+.notes-toggle-btn {
+  opacity: 0.5;
+  font-size: 0.82rem;
+}
+.notes-toggle-btn.notes-active,
+.notes-toggle-btn:hover {
+  opacity: 1;
+}
+.notes-section {
+  margin-top: 0.5rem;
+}
+.notes-textarea {
+  width: 100%;
+  resize: vertical;
+  font-size: 0.88rem;
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
 }
 </style>
 

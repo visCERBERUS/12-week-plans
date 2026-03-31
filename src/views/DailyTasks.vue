@@ -21,6 +21,7 @@
           @increment-planned="tasksStore.incrementPlanned(task.id)"
           @decrement-planned="tasksStore.decrementPlanned(task.id)"
           @record-interruption="tasksStore.recordInterruption(task.id)"
+          @update-notes="notes => tasksStore.updateTaskNotes(task.id, notes)"
         />
       </div>
 
@@ -76,6 +77,7 @@
           @increment-planned="tasksStore.incrementPlanned(task.id)"
           @decrement-planned="tasksStore.decrementPlanned(task.id)"
           @record-interruption="tasksStore.recordInterruption(task.id)"
+          @update-notes="notes => tasksStore.updateTaskNotes(task.id, notes)"
         />
       </div>
 

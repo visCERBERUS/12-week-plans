@@ -18,7 +18,19 @@ export const useWeeklyPlanStore = defineStore('weeklyPlan', () => {
   function addTask(weekNum, text) {
     const key = `week-${weekNum}`
     if (!tasksByWeek.value[key]) tasksByWeek.value[key] = []
-    tasksByWeek.value[key].push({ id: crypto.randomUUID(), text, done: false })
+    tasksByWeek.value[key].push({ id: crypto.randomUUID(), text, done: false, notes: '' })
+  }
+
+  function updateTask(weekNum, taskId, newText) {
+    const tasks = getWeekTasks(weekNum)
+    const task = tasks.find(t => t.id === taskId)
+    if (task) task.text = newText
+  }
+
+  function updateTaskNotes(weekNum, taskId, notes) {
+    const tasks = getWeekTasks(weekNum)
+    const task = tasks.find(t => t.id === taskId)
+    if (task) task.notes = notes
   }
 
   function toggleTask(weekNum, id) {
@@ -34,5 +46,5 @@ export const useWeeklyPlanStore = defineStore('weeklyPlan', () => {
     }
   }
 
-  return { tasksByWeek, getWeekTasks, addTask, toggleTask, deleteTask }
+  return { tasksByWeek, getWeekTasks, addTask, updateTask, updateTaskNotes, toggleTask, deleteTask }
 })

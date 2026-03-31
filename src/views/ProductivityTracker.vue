@@ -20,6 +20,9 @@
         <div class="day-name">{{ day.weekdayShort }}</div>
         <div class="day-date">{{ day.dateShort }}</div>
         <div class="day-pomodoros">{{ day.pomodoros }} 🍅</div>
+        <div v-if="day.totalTasks > 0" class="day-tasks">
+          {{ day.completedTasks }}/{{ day.totalTasks }} ✅
+        </div>
         <div class="day-meta">
           <span v-if="day.avgConc !== null" class="day-conc">⭐ {{ day.avgConc.toFixed(1) }}</span>
           <span class="day-goal-pct" :style="{ color: goalPctColor(day.goalPct) }">
@@ -56,6 +59,14 @@
         <div class="metric-item">
           <span class="metric-num">{{ weekMetrics.goalDaysPct }}%</span>
           <span class="metric-label">Выполнение целей</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-num">{{ weekMetrics.completedTasks }}/{{ weekMetrics.totalTasks }}</span>
+          <span class="metric-label">Задачи выполнено</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-num">{{ weekMetrics.taskCompletionPct }}%</span>
+          <span class="metric-label">% выполнения задач</span>
         </div>
       </div>
     </div>
@@ -111,8 +122,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { usePomodoroStore } from '../stores/pomodoro.js'
+import { useTasksStore } from '../stores/tasks.js'
 
 const pomodoroStore = usePomodoroStore()
+const tasksStore = useTasksStore()
 
 const WEEKDAYS_SHORT = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
@@ -168,6 +181,9 @@ const weekDays = computed(() => {
       ? concSessions.reduce((s, x) => s + x.concentrationRating, 0) / concSessions.length
       : null
     const goalPct = dailyGoal > 0 ? Math.min(100, Math.round(pomodoros / dailyGoal * 100)) : 0
+    const dayTasks = tasksStore.tasksByDate[key] || []
+    const totalTasks = dayTasks.length
+    const completedTasks = dayTasks.filter(t => t.done).length
     days.push({
       key,
       weekdayShort: WEEKDAYS_SHORT[i],
@@ -175,7 +191,9 @@ const weekDays = computed(() => {
       pomodoros,
       avgConc,
       goalPct,
-      hasData: pomodoros > 0,
+      hasData: pomodoros > 0 || totalTasks > 0,
+      totalTasks,
+      completedTasks,
     })
   }
   return days
@@ -224,7 +242,11 @@ const weekMetrics = computed(() => {
   const goalDaysPct = Math.round(goalDays / 7 * 100)
   const rating = dailyGoal > 0 ? Math.min(100, Math.round(totalPomodoros / (dailyGoal * 7) * 100)) : 0
 
-  return { totalPomodoros, avgPerActiveDay, avgConc, totalInterruptions, focusTime, goalDaysPct, rating }
+  const totalTasks = weekDays.value.reduce((s, d) => s + d.totalTasks, 0)
+  const completedTasks = weekDays.value.reduce((s, d) => s + d.completedTasks, 0)
+  const taskCompletionPct = totalTasks > 0 ? Math.round(completedTasks / totalTasks * 100) : 0
+
+  return { totalPomodoros, avgPerActiveDay, avgConc, totalInterruptions, focusTime, goalDaysPct, rating, totalTasks, completedTasks, taskCompletionPct }
 })
 
 const ratingColor = computed(() => getRatingColor(weekMetrics.value.rating))
@@ -325,6 +347,11 @@ const historyWeeks = computed(() => {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.day-tasks {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
 }
 
 .day-meta {
