@@ -29,6 +29,7 @@ const navItems = [
   { path: '/weekly', icon: '📆', label: 'Неделя' },
   { path: '/monthly', icon: '🗓️', label: '4 нед.' },
   { path: '/yearly', icon: '🎯', label: '12 нед.' },
+  { path: '/plan-1c', icon: '🏗️', label: '1С план' },
   { path: '/settings', icon: '⚙️', label: 'Настр.' },
   { path: '/finance', icon: '💰', label: 'Финансы' },
 ]
