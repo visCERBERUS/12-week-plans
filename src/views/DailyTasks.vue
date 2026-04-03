@@ -263,7 +263,7 @@ function playBeep() {
   padding: 1rem 1.25rem;
   margin-bottom: 2rem;
   border: 1px solid var(--accent);
-  background: var(--accent-subtle, rgba(124, 111, 255, 0.06));
+  background: var(--accent-subtle, var(--accent-glow));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
@@ -364,8 +364,8 @@ function playBeep() {
 }
 
 .unplanned-badge {
-  background: rgba(255, 149, 0, 0.1);
-  color: #FF9500;
+  background: color-mix(in srgb, var(--text-secondary) 15%, transparent);
+  color: var(--text-secondary);
 }
 
 .section-hint {

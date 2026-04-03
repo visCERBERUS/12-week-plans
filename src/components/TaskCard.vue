@@ -282,7 +282,7 @@ function togglePause() {
 }
 
 .dot-filled {
-  background: #FF3B30;
+  background: var(--danger);
 }
 
 .dot-empty {
@@ -440,7 +440,7 @@ function togglePause() {
 
 .delete-btn:hover {
   opacity: 1 !important;
-  background: rgba(255, 59, 48, 0.12);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
   color: var(--danger);
 }
 
