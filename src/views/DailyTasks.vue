@@ -72,7 +72,7 @@
               aria-label="Уменьшить количество помидоров"
               @click="newTaskPomodoros = Math.max(1, newTaskPomodoros - 1)"
             >−</button>
-            <span class="pomodoro-count-label">🍅&nbsp;{{ newTaskPomodoros }}</span>
+            <span class="pomodoro-count-label">🍅 {{ newTaskPomodoros }}</span>
             <button
               class="btn btn-ghost btn-icon-sm"
               aria-label="Увеличить количество помидоров"

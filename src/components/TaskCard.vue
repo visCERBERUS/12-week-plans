@@ -208,7 +208,7 @@ function togglePause() {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid var(--border-strong, rgba(0,0,0,0.2));
+  border: 2px solid var(--border-strong, rgba(0, 0, 0, 0.2));
   background: transparent;
   cursor: pointer;
   display: flex;
@@ -222,7 +222,7 @@ function togglePause() {
 
 .task-checkbox:hover {
   border-color: var(--accent);
-  background: var(--accent-subtle, rgba(124,111,255,0.1));
+  background: var(--accent-subtle, rgba(124, 111, 255, 0.1));
 }
 
 .task-checkbox.checked {

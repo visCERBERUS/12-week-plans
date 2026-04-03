@@ -91,7 +91,7 @@ const tasksStore = useTasksStore()
 
 const greeting = computed(() => {
   const h = new Date().getHours()
-  if (h < 5)  return 'Доброй ночи 🌙'
+  if (h < 5) return 'Доброй ночи 🌙'
   if (h < 12) return 'Доброе утро ☀️'
   if (h < 17) return 'Добрый день 👋'
   return 'Добрый вечер 🌆'
